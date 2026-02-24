@@ -1,0 +1,1391 @@
+openapi: 3.1.0
+info:
+  title: AI Agent Integration APIs
+  version: 1.0.0
+  description: Uses these APIs to connect to your AI Agent integrations
+servers:
+  - url: https://integrations.copilot.live/v1
+    description: Integrations server
+security:
+  - integrationIDHeader: []
+    integrationTokenHeader: []
+  - integrationIDQuery: []
+    integrationTokenQuery: []
+paths:
+  /details:
+    get:
+      operationId: details
+      parameters: []
+      description: Get details of the integration
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/detailsRes'
+  /phoneCall/initiate-phone-call:
+    post:
+      operationId: phoneCall
+      parameters: []
+      description: Initiate a phone call
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/phoneCall'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/phoneCallCreateRes'
+  /conversations:
+    get:
+      operationId: conversationsList
+      parameters:
+        - in: query
+          name: userId
+          description: ID of the user
+          schema:
+            type: string
+        - in: query
+          name: state
+          description: State of the conversation in Human Handover
+          schema:
+            type: string
+        - in: query
+          name: startDate
+          description: Start date for filtering conversations.
+          schema:
+            type: string
+        - in: query
+          name: endDate
+          description: End date for filtering conversations.
+          schema:
+            type: string
+        - in: query
+          name: surface
+          description: Surface for the conversation
+          schema:
+            type: string
+        - in: query
+          name: limit
+          description: page limit
+          schema:
+            type: number
+        - in: query
+          name: sortOrder
+          description: sort order
+          schema:
+            type: string
+        - in: query
+          name: next
+          description: next cursor (nullable)
+          schema:
+            type: string
+      description: List conversations
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsListRes'
+    post:
+      operationId: conversationsCreate
+      parameters: []
+      description: Create a conversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversationsCreate'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsCreateRes'
+  /conversations/ask-agent:
+    post:
+      operationId: askAgent
+      parameters: []
+      description: >-
+        Handles synchronous AI messaging by auto-managing users, conversations,
+        and context to return real-time AI Agent responses.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/askAgentRequestBody'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/askAgentResponse'
+  /conversations/{id}:
+    put:
+      operationId: conversationsUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Update a conversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversationsUpdate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsCreateRes'
+    get:
+      operationId: conversationsGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Get a conversation
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsCreateRes'
+    delete:
+      operationId: conversationsDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Delete a conversation
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteRes'
+  /conversations/{id}/takeover:
+    post:
+      operationId: conversationsTakeover
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Takeover a conversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversationsTakeover'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsTakeoverRes'
+  /conversations/{id}/messages:
+    post:
+      operationId: conversationsMessagesCreate
+      parameters:
+        - in: query
+          name: generateAssistantMessage
+          description: generate assistant message for the user message
+          schema:
+            type: string
+        - in: query
+          name: wait
+          description: >-
+            wait for the assistant message to be generated before returning the
+            API response
+          schema:
+            type: string
+        - in: query
+          name: maxTokens
+          description: max response tokens for the assistant message
+          schema:
+            type: number
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Create a message in a conversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversationsMessagesCreate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsMessagesCreateRes'
+    get:
+      operationId: conversationsMessagesList
+      parameters:
+        - in: query
+          name: limit
+          description: page limit
+          schema:
+            type: number
+        - in: query
+          name: sortOrder
+          description: sort order
+          schema:
+            type: string
+        - in: query
+          name: next
+          description: next cursor (nullable)
+          schema:
+            type: string
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: List messages in a conversation
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsMessagesListRes'
+    put:
+      operationId: conversationsMessagesFeedback
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Feedback on a message in a conversation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/conversationsMessagesFeedback'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/conversationsMessagesFeedbackRes'
+  /users:
+    post:
+      operationId: usersCreate
+      parameters: []
+      description: Create a user, if user exist then it will update the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usersCreate'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersCreateRes'
+    get:
+      operationId: usersList
+      parameters:
+        - in: query
+          name: limit
+          description: page limit
+          schema:
+            type: number
+        - in: query
+          name: sortOrder
+          description: sort order
+          schema:
+            type: string
+        - in: query
+          name: next
+          description: next cursor (nullable)
+          schema:
+            type: string
+      description: List users
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersListRes'
+  /users/{id}:
+    put:
+      operationId: usersUpdate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Update a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usersCreate'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersCreateRes'
+    delete:
+      operationId: usersDelete
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Delete a user
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteRes'
+    get:
+      operationId: usersGet
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Get a user by user id or a host id
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersCreateRes'
+  /users/host/{id}:
+    get:
+      operationId: usersGetByHostId
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      description: Get a user by user id or a host id
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/usersCreateRes'
+components:
+  schemas:
+    phoneCallCreateRes:
+      type: object
+      properties:
+        message:
+          type: string
+          description: gives message successfull status
+        phoneNumber:
+          type: string
+          description: Number to which call is made
+    phoneCall:
+      type: object
+      properties:
+        greetingMessage:
+          type: string
+          description: The message used as the first message in the call
+        hostId:
+          type: string
+          description: The unique identifier of the user
+        phoneNumber:
+          type: string
+          description: The phone number of the user
+        name:
+          type: string
+          description: The name of the user
+        meta:
+          type: object
+          properties:
+            additionalFields:
+              type: object
+              description: Any additional user information
+        conversationContext:
+          type: object
+          description: Contextual information for the call
+        callbackUrl:
+          type: string
+          description: >-
+            Call details will be sent to this callback webhook url(POST) on call
+            completion
+      required:
+        - phoneNumber
+      additionalProperties: false
+    conversationsCreate:
+      type: object
+      properties:
+        id:
+          description: ID of the conversation (optional)
+          type: string
+        title:
+          description: Conversation title
+          type: string
+        userId:
+          description: ID of the user who started the conversation
+          type: string
+          minLength: 1
+        meta:
+          type: object
+          default: {}
+          description: conversation custom meta info
+      required:
+        - title
+        - userId
+    conversationsListQuery:
+      type: object
+      properties:
+        userId:
+          type:
+            - string
+            - 'null'
+          description: ID of the user
+        state:
+          type:
+            - string
+            - 'null'
+          enum:
+            - support_in_progress
+            - support_requested
+            - waiting_for_support
+            - resolved
+          description: State of the conversation in Human Handover
+        startDate:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: Start date for filtering conversations.
+        endDate:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: End date for filtering conversations.
+        surface:
+          type:
+            - string
+            - 'null'
+          enum:
+            - web
+            - platform
+            - hosted-web
+            - mobile
+            - whatsapp
+            - call
+            - figma-plugin
+            - vscode-extension
+            - slack
+            - jira-app
+            - integration
+            - workflow
+          description: Surface for the conversation
+        limit:
+          type: number
+          description: page limit
+          default: 10
+        sortOrder:
+          type: string
+          enum:
+            - asc
+            - desc
+          description: sort order
+          default: desc
+        next:
+          type:
+            - string
+            - 'null'
+          description: next cursor (nullable)
+          default: null
+      additionalProperties: false
+    conversationsListRes:
+      type: object
+      properties:
+        page:
+          type: object
+          properties:
+            next:
+              type: string
+              description: next cursor
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                description: ID of the conversation
+                type: string
+              title:
+                description: Conversation title
+                type: string
+              userId:
+                description: ID of the user who started the conversation
+                type: string
+                minLength: 1
+              createdAt:
+                type: string
+              updatedAt:
+                type: string
+              deletedAt:
+                type: string
+    conversationsCreateRes:
+      type: object
+      properties:
+        id:
+          description: ID of the conversation
+          type: string
+        title:
+          description: Conversation title
+          type: string
+        userId:
+          description: ID of the user who started the conversation
+          type: string
+          minLength: 1
+        meta:
+          type: object
+          default: {}
+          description: conversation custom meta info
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        deletedAt:
+          type: string
+    conversationsUpdate:
+      type: object
+      properties:
+        title:
+          description: Conversation title
+          type: string
+        meta:
+          type: object
+          default: {}
+          description: conversation custom meta info
+    conversationsMessagesCreate:
+      type: object
+      properties:
+        id:
+          description: ID of the message (optional)
+          type: string
+        content:
+          description: message content
+          type: string
+        role:
+          description: message sender's role
+          enum:
+            - assistant
+            - system
+            - user
+            - support
+          type: string
+        userId:
+          description: ID of the user who sent the message
+          type: string
+          minLength: 1
+        meta:
+          type: object
+          default: {}
+          description: message custom meta info
+        customComponents:
+          type: array
+          items:
+            type: string
+          description: custom HTML components for the message
+      allOf:
+        - if:
+            properties:
+              role:
+                const: user
+          then:
+            required:
+              - content
+              - userId
+              - role
+          else:
+            if:
+              properties:
+                role:
+                  const: support
+            then:
+              required:
+                - content
+                - role
+                - meta
+              properties:
+                meta:
+                  type: object
+                  required:
+                    - customerSupport
+                  properties:
+                    customerSupport:
+                      type: object
+                      required:
+                        - id
+                        - firstName
+                        - lastName
+                      properties:
+                        id:
+                          type: string
+                          description: >-
+                            id of the external support agent. if not passed the
+                            appID will be used
+                        firstName:
+                          type: string
+                          description: first name of the external support agent
+                        lastName:
+                          type: string
+                          description: last name of the external support agent
+            else:
+              required:
+                - content
+                - role
+    conversationsMessagesCreateQuery:
+      type: object
+      properties:
+        generateAssistantMessage:
+          type:
+            - string
+            - boolean
+          default: 'false'
+          description: generate assistant message for the user message
+        wait:
+          type:
+            - string
+            - boolean
+          default: 'false'
+          description: >-
+            wait for the assistant message to be generated before returning the
+            API response
+        maxTokens:
+          type:
+            - number
+            - string
+          default: 4096
+          description: max response tokens for the assistant message
+    conversationsMessagesCreateRes:
+      type: object
+      properties:
+        id:
+          description: ID of the message
+          type: string
+        threadId:
+          description: ID of the conversation
+          type: string
+        content:
+          description: message content
+          type: string
+        role:
+          description: message sender's role
+          enum:
+            - assistant
+            - system
+            - user
+            - support
+          type: string
+        type:
+          description: message type
+          type: string
+        userId:
+          description: ID of the user who sent the message
+          type: string
+        meta:
+          type: object
+          default: {}
+          description: message custom meta info
+          properties:
+            customerSupport:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: >-
+                    id of the external support agent. if not passed the appID
+                    will be used
+                firstName:
+                  type: string
+                  description: first name of the external support agent
+                lastName:
+                  type: string
+                  description: last name of the external support agent
+        thread:
+          type: object
+          default: {}
+          description: thread details
+        reply:
+          type: object
+          default: {}
+          description: >-
+            returns the AI Agent reply if generateAssistantMessage is set to
+            "true"
+        customComponents:
+          type: array
+          items:
+            type: string
+          description: custom HTML component for the message
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        deletedAt:
+          type: string
+    conversationsMessagesListRes:
+      type: object
+      properties:
+        page:
+          type: object
+          properties:
+            limit:
+              type: number
+              description: page limit
+              default: 10
+            sortOrder:
+              type: string
+              enum:
+                - asc
+                - desc
+              description: sort order
+              default: desc
+            next:
+              type:
+                - string
+                - 'null'
+              description: next cursor (nullable)
+              default: null
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                description: ID of the message
+                type: string
+              threadId:
+                description: ID of the conversation
+                type: string
+              content:
+                description: message content
+                type: string
+              role:
+                description: message sender's role
+                enum:
+                  - assistant
+                  - system
+                  - user
+                  - support
+                type: string
+              type:
+                description: message type
+                type: string
+              userId:
+                description: ID of the user who sent the message
+                type: string
+              meta:
+                type: object
+                default: {}
+                description: message custom meta info
+                properties:
+                  customerSupport:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: >-
+                          id of the external support agent. if not passed the
+                          appID will be used
+                      firstName:
+                        type: string
+                        description: first name of the external support agent
+                      lastName:
+                        type: string
+                        description: last name of the external support agent
+              thread:
+                type: object
+                default: {}
+                description: thread details
+              reply:
+                type: object
+                default: {}
+                description: >-
+                  returns the AI Agent reply if generateAssistantMessage is set
+                  to "true"
+              customComponents:
+                type: array
+                items:
+                  type: string
+                description: custom HTML component for the message
+              createdAt:
+                type: string
+              updatedAt:
+                type: string
+              deletedAt:
+                type: string
+    conversationsMessagesFeedback:
+      type: object
+      properties:
+        id:
+          description: ID of the message
+          type: string
+        rating:
+          description: message content
+          type: string
+          enum:
+            - POSITIVE
+            - NEGATIVE
+      required:
+        - id
+        - rating
+    conversationsMessagesFeedbackRes:
+      type: object
+      properties:
+        id:
+          description: ID of the message
+          type: string
+        rating:
+          description: message content
+          type: string
+          enum:
+            - POSITIVE
+            - NEGATIVE
+        updatedAt:
+          type: string
+    conversationsTakeover:
+      type: object
+      properties:
+        action:
+          description: takeover action
+          enum:
+            - join
+            - leave
+          type: string
+        customerSupport:
+          type: object
+          properties:
+            id:
+              description: ID of the agent that updated the conversation state
+              type: string
+            firstName:
+              description: ID of the agent that updated the conversation state
+              type: string
+            lastName:
+              description: ID of the agent that updated the conversation state
+              type: string
+            profilePicUrl:
+              description: Profile pic/avatar url
+              type: string
+          required:
+            - id
+            - firstName
+            - lastName
+      required:
+        - action
+        - customerSupport
+    conversationsTakeoverRes:
+      type: object
+      properties:
+        id:
+          description: ID of the conversation to join or leave
+          type: string
+        updatedAt:
+          type: string
+        customerSupport:
+          type: object
+          properties:
+            id:
+              description: ID of the agent that updated the conversation state
+              type: string
+            firstName:
+              description: ID of the agent that updated the conversation state
+              type: string
+            lastName:
+              description: ID of the agent that updated the conversation state
+              type: string
+            profilePicUrl:
+              description: Profile pic/avatar url
+              type: string
+            state:
+              description: current conversation state
+              enum:
+                - support_in_progress
+                - support_requested
+                - ''
+              type: string
+        meta:
+          type: object
+          default: {}
+          description: custom meta info
+    deleteRes:
+      type: object
+      properties:
+        id:
+          description: ID of the deleted resource
+          type: string
+        deletedAt:
+          description: Deletion timestamp
+          type: string
+    paginate:
+      type: object
+      properties:
+        limit:
+          type: number
+          description: page limit
+          default: 10
+        sortOrder:
+          type: string
+          enum:
+            - asc
+            - desc
+          description: sort order
+          default: desc
+        next:
+          type:
+            - string
+            - 'null'
+          description: next cursor (nullable)
+          default: null
+    usersCreate:
+      type: object
+      properties:
+        hostId:
+          type: string
+          description: external id of the user
+        name:
+          type: string
+          description: name of the user
+        email:
+          type: string
+          description: email of the user
+        phone:
+          type: string
+          description: phone of the user
+        profilePicUrl:
+          type: string
+          description: profile pic of the user
+        meta:
+          type: object
+          default: {}
+          description: custom meta info
+        surfaces:
+          type: array
+          items:
+            type: string
+            enum:
+              - call
+              - hosted-web
+              - web
+              - whatsapp
+              - mobile
+            default: web
+          description: users device surface
+        device:
+          type: object
+          description: user's device info
+          properties:
+            userAgent:
+              type: string
+            platform:
+              type: string
+            appVersion:
+              type: string
+            languages:
+              type: array
+              items:
+                type: string
+          default: {}
+        location:
+          type: object
+          properties:
+            geo:
+              type: object
+              properties:
+                latitude:
+                  type: string
+                longitude:
+                  type: string
+            postalCode:
+              type: string
+            region:
+              type: string
+            regionCode:
+              type: string
+            city:
+              type: string
+            timezone:
+              type: string
+            country:
+              type: string
+            countryCode:
+              type: string
+          default: {}
+    usersCreateRes:
+      type: object
+      properties:
+        id:
+          type: string
+          description: internal id of the user
+        hostId:
+          type: string
+          description: external id of the user
+        name:
+          type: string
+          description: name of the user
+        email:
+          type: string
+          description: email of the user
+        phone:
+          type: string
+          description: phone of the user
+        profilePicUrl:
+          type: string
+          description: profile pic of the user
+        meta:
+          type: object
+          default: {}
+          description: custom meta info
+        surfaces:
+          type: array
+          items:
+            type: string
+            enum:
+              - call
+              - hosted-web
+              - web
+              - whatsapp
+              - mobile
+            default: web
+          description: users device surface
+        device:
+          type: object
+          description: user's device info
+          properties:
+            userAgent:
+              type: string
+            platform:
+              type: string
+            appVersion:
+              type: string
+            languages:
+              type: array
+              items:
+                type: string
+          default: {}
+        location:
+          type: object
+          properties:
+            geo:
+              type: object
+              properties:
+                latitude:
+                  type: string
+                longitude:
+                  type: string
+            postalCode:
+              type: string
+            region:
+              type: string
+            regionCode:
+              type: string
+            city:
+              type: string
+            timezone:
+              type: string
+            country:
+              type: string
+            countryCode:
+              type: string
+          default: {}
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        deletedAt:
+          type: string
+    usersListRes:
+      type: object
+      properties:
+        totalItems:
+          type: number
+        hasNext:
+          type: boolean
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: internal id of the user
+              threadCount:
+                type: number
+                description: number of threads created by the user
+              hostId:
+                type: string
+                description: external id of the user
+              name:
+                type: string
+                description: name of the user
+              email:
+                type: string
+                description: email of the user
+              phone:
+                type: string
+                description: phone of the user
+              profilePicUrl:
+                type: string
+                description: profile pic of the user
+              meta:
+                type: object
+                default: {}
+                description: custom meta info
+              surfaces:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - call
+                    - hosted-web
+                    - web
+                    - whatsapp
+                    - mobile
+                  default: web
+                description: users device surface
+              device:
+                type: object
+                description: user's device info
+                properties:
+                  userAgent:
+                    type: string
+                  platform:
+                    type: string
+                  appVersion:
+                    type: string
+                  languages:
+                    type: array
+                    items:
+                      type: string
+                default: {}
+              location:
+                type: object
+                properties:
+                  geo:
+                    type: object
+                    properties:
+                      latitude:
+                        type: string
+                      longitude:
+                        type: string
+                  postalCode:
+                    type: string
+                  region:
+                    type: string
+                  regionCode:
+                    type: string
+                  city:
+                    type: string
+                  timezone:
+                    type: string
+                  country:
+                    type: string
+                  countryCode:
+                    type: string
+                default: {}
+              createdAt:
+                type: string
+              updatedAt:
+                type: string
+              deletedAt:
+                type: string
+    detailsRes:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        meta:
+          type: string
+        events:
+          type: array
+          items:
+            type: string
+        operations:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+        public:
+          type: boolean
+        isSystem:
+          type: boolean
+    askAgentRequestBody:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            hostId:
+              type: string
+            phone:
+              type: string
+              description: phone of the user
+            email:
+              type: string
+              format: email
+            name:
+              type: string
+            additionalFields:
+              type: object
+              additionalProperties:
+                type: string
+          required: []
+          additionalProperties: false
+        conversation:
+          type: object
+          properties:
+            id:
+              type: string
+            title:
+              type: string
+            tag:
+              type: string
+          required: []
+          additionalProperties: false
+        conversationContext:
+          type: object
+          additionalProperties: true
+        surface:
+          type: string
+          enum:
+            - web
+            - platform
+            - hosted-web
+            - mobile
+            - whatsapp
+            - call
+            - figma-plugin
+            - vscode-extension
+            - slack
+            - jira-app
+            - integration
+            - workflow
+          default: workflow
+        query:
+          type: string
+          minLength: 1
+      required:
+        - query
+      additionalProperties: false
+    askAgentResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
+          additionalProperties: false
+        conversation:
+          type: object
+          properties:
+            id:
+              type: string
+          required:
+            - id
+          additionalProperties: false
+        message:
+          type: object
+          properties:
+            id:
+              type: string
+            response:
+              type: string
+            components:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - card-list
+                      - card-detail
+                  data:
+                    type: object
+          required:
+            - id
+            - response
+            - components
+          additionalProperties: false
+      required:
+        - user
+        - conversation
+        - message
+        - latency_ms
+      additionalProperties: false
+  securitySchemes:
+    integrationIDHeader:
+      type: apiKey
+      in: header
+      name: x-integration-id
+      description: your integration ID
+    integrationTokenHeader:
+      type: apiKey
+      in: header
+      name: x-integration-token
+      description: your integration token
+    integrationIDQuery:
+      type: apiKey
+      in: query
+      name: x-integration-id
+      description: your integration ID
+    integrationTokenQuery:
+      type: apiKey
+      in: query
+      name: x-integration-token
+      description: your integration token
